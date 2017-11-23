@@ -1,0 +1,1 @@
+set term x11 0 persistsplot 'planes.dat' every ::2000:: w p lt rgb 'red'
