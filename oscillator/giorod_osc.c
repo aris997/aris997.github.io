@@ -10,7 +10,7 @@
 /********OSCILLATORE ARMONICO********/
 //note di sviluppo
 //- algoritmi implementati: EULERO, EULERO-CROMER, PUNTO CENTRALE, MEZZO PASSO
-//- GNUPLOT AUTOMATICO SE DEFINITO DA GCC (INOLTRE CREA UNO SCRIPT SE GIÀ NON ESISTE)
+//- GNUPLOT AUTOMATICO SE DEFINITO DA GCC (INOLTRE CREA UNO SCRIPT SE NON ESISTE)
 //- L'ALGORITMO USATO VIENE SCELTO DALL'UTENTE OGNI VOLTA (IL SISTEMA DI SCELTA PREVEDE PUNTATORI A FUNZIONI)
 //- DAL FILE INPUT È POSSIBILE ESEGUIRE PIÙ CASI, RICORDARE DI CAMBIARE IL VALORE
 //  DEL DEFINE "INPUT_ROWS" PER LEGGERE PIÙ RIGHE DEL FILE INPUT
@@ -100,7 +100,7 @@ int main(int argc, char *argv[]){
   fclose(output_energy);
   fclose(input);
   clock_t end = clock();
-  printf("Execution time; %lf\n", (double)(end-start)/(double)CLOCKS_PER_SEC);
+  printf("Execution time: %lf\n", (double)(end-start)/(double)CLOCKS_PER_SEC);
 
   #ifdef GNUPLOT
     FILE *gpscript;
@@ -178,7 +178,7 @@ void errori(int n){
   if (n==404){
     printf("ERROR 404\nINPUT FILE NOT FOUND!!!\nCreate an input file faster than light,\n");
     printf("Please use the following order for starting point:\nx0 y0 omega2 dt tmax\n");
-    printf("Hint:\n2. 1. 3. 0.01 50\n")
+    printf("Hint:\n2. 1. 3. 0.01 50\n");
   }
   if (n==-1){
     printf("ERROR -1\nGENERIC PROBLEM\nCall the guys that gived u this awesome code\n");
