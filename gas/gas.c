@@ -4,7 +4,7 @@
 #include <math.h>
 #include <time.h>
 
-#define L 80
+#define L 20
 #define RHO 0.2
 #define MEASURES (TMAX/WIDTH)
 #define TMAX 2000
@@ -14,6 +14,14 @@
 //RODARI-RIVA   30 NOVEMBRE 2017    v1.0.0    lfc409
 
 /**************GAS RETICOLARE***************/
+//
+//
+//
+//
+//
+//
+//
+//
 //
 //
 //
@@ -29,8 +37,8 @@ typedef struct coord{
 
 void errori(int);
 void init(pos [][L]);
+void check(pos [][L]);
 void fprinter(pos [][L]);
-void check_diocane(pos [][L]);
 void initNeighbor(long int*,long int*);
 void measurements(coord*,coord*,double*,int,int);
 void seedingParticels(pos [][L],coord*,coord*,coord*,int);
@@ -55,11 +63,9 @@ int main () {
   printf("Particels: %lld\n", N);
   #endif
   
-  //double Drho[MEASURES];
-
   pos site[L][L];
 
-  
+
   coord *initsite;
   initsite = (coord *) calloc(N+1, sizeof(coord));
   if (initsite == NULL) errori(100);
@@ -81,7 +87,7 @@ int main () {
   
     init(site);
     seedingParticels(site, particels, initsite, truesite, N);
-    check_diocane(site);
+    check(site);
 
     #ifdef VERBOSE_MODE
       printf("Initialization termined, story:%llu\n", i+1);
@@ -89,26 +95,33 @@ int main () {
 
     for(T=0; T<TMAX; T++){
       particelswalk(site, particels, truesite, Dnarrow, Snarrow, N);
-      if ((T % WIDTH) == 0) measurements(truesite, initsite, meanDR2, T/WIDTH, N);
+      if((T % WIDTH) == 0) measurements(truesite, initsite, meanDR2, T/WIDTH, N);
     }
     
     #ifdef VISUAL_MODE
       fprinter(site);
     #endif
+  }
 
+      /******Analisi Dati******/
+
+  FILE *output1;
+  output1 = fopen("drho.dat", "w");
+  fprintf(output1, "#deltaRquadro(t)\n");
+  for(i=1; i<MEASURES; i++){
+    meanDR2[i]/=NSTORIES;
+    fprintf(output1, "%lf\n", meanDR2[i]);
+    printf("%lf\n", meanDR2[i]);
   }
 
 
-
-
-
-      /******Analisi Dati******/
 
 
   free(initsite);
   free(truesite);
   free(particels);
   free(meanDR2);
+  fclose(output1);
 
   
   #ifdef CRONO_MODE
@@ -153,6 +166,7 @@ void seedingParticels(pos site[L][L], coord particels[], coord initstate[], coor
       x = lrand48()%L;
       y = lrand48()%L;
     } while(site[x][y] > 0);
+
     site[x][y] = p;
     particels[p].x = x;
     particels[p].y = y;
@@ -163,39 +177,10 @@ void seedingParticels(pos site[L][L], coord particels[], coord initstate[], coor
   }
 }
 
-void check_diocane(pos site[L][L]){
+void check(pos site[L][L]){
   int x, y;
-  for(x=0; x<L; x++){
-    for(y=0; y<L; y++){
-      if (site[x][y] > RHO*L*L) {
-        printf("PORCACCIO IL DIO MALEDETTO INFAME BOIA\n");
-        exit(-1);
-      }
-    }
-  }
+  for(x=0; x<L; x++) for(y=0; y<L; y++) if(site[x][y] > RHO*L*L) errori(101);
 }
-
-
-
-// void Sites2Particels(coord state[], int site[L][L], int N){
-  
-//   int x, y;
-//   int p=0;
-  
-//   for(x = 0; x < L; x++){
-//     for(y = 0; y < L; y++){
-//       if(site[x][y] > 0){
-//         state[p].x = x;
-//         state[p].y = y;
-//         p++;
-//       }
-//       #ifdef DEBUG_MODE
-//         if (p > N) errori(99);
-//       #endif
-//     }
-//   }
-// }
-
 
 ////////////////////////////////////////////////////////////////////////////////
 //***************************PARTICEL WALK FUNCTION***************************//
@@ -254,39 +239,28 @@ void particelswalk(pos site[L][L], coord particels[], coord truesite[], long int
   #endif
 }
 
-
-
-
-
-
-
 void measurements(coord truesite[], coord initsite[], double meanDR2[], int t, int N){
   int p=0;
-  
-  for(p=1; p<=N; p++) {  
-    meanDR2[t+1] += pow(( truesite[p].x - initsite[p].x ), 2) + pow(( truesite[p].y - initsite[p].y ), 2);
+  double R2=0.;
+  for(p=1; p<=N; p++){
+    R2 += pow((truesite[p].x-initsite[p].x),2) + pow((truesite[p].y-initsite[p].y),2);
   }
+  R2/=(double)N;
+  meanDR2[t+1] += R2;
 }
-
-
-
-
-
-
-
 
 void fprinter(pos site[L][L]){
 
   int x, y;
-  FILE *output;
-  output = fopen("data.dat", "w");
-
+  FILE *op;
+  op = fopen("data.dat", "w");
+  fprintf(op, "#Coordinates of seeded points (index is the particle name)\n");
   for(x=0; x<L; x++){
     for(y=0; y<L; y++){
-      if (site[x][y] > 0) fprintf(output, "%d %d\n", x, y);
+      if (site[x][y] > 0) fprintf(op, "%d %d\n", x, y);
     }
   }
-  fclose(output);
+  fclose(op);
 }
 
 void errori(int n){
@@ -295,6 +269,9 @@ void errori(int n){
   }
   else if(n == 99){
     printf("ERROR 99\ntoo many particels but some of them doesn't exist!!!\n");
+  }
+  else if(n == 101){
+    printf("REVIEW DEFINES, U MADE A MISTAKE\n");
   }
   exit(-1);
 }
