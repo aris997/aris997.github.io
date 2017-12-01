@@ -9,23 +9,24 @@
 #define MEASURES (TMAX/WIDTH)
 #define TMAX 2000
 #define WIDTH 10
-#define NSTORIES 10
+#define NSTORIES 1000
 
-//RODARI-RIVA   30 NOVEMBRE 2017    v1.0.0    lfc409
+//RODARI-RIVA   30 NOVEMBRE 2017    v1.0.0    labfc409
 
-/**************GAS RETICOLARE***************/
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
+/******************************************GAS RETICOLARE******************************************/
+// -    lrand48 genera posizioni casuali nell'intervallo (0,L), si tiene conto della particella
+//    per tutto il programma numerandole una ad una.
+// -    Il sistema da spesso errore, a causa della facilità con cui si superano le dimensioni
+//    dell'architettura del computer. È quindi consigliato in tali casi compilare il codice
+//    inserendo il define "-D DEBUG_MODE" o "-D VERBOSE_MODE", la prima è principalmente di debug
+//    mentre la seconda è stata utile per scovare delle discordanze nel codice.
+//      Altri define sono "-D VISUAL_MODE", stampa un file di prova per poter osservare le
+//    posizioni delle particelle; "-D CRONO_MODE" restituisce un eseguibile che misura il suo
+//    tempo di esecuzione.
+// -    Nel codice più volte sono usciti errori particolari, essi sono stati raggruppati in una
+//    funzione che stampa su schermo l'oggetto dell'errore ed esce dal codice senza riportare
+//    segmentation fault o altri casi problematici. Gli errori implementati fin'ora sono 99,
+//    100, 101. Ciascuno ha una causa specifica.
 
 typedef long long int pos;
 typedef unsigned long long int steps;
@@ -38,6 +39,7 @@ typedef struct coord{
 void errori(int);
 void init(pos [][L]);
 void check(pos [][L]);
+void somme(pos [][L]);
 void fprinter(pos [][L]);
 void initNeighbor(long int*,long int*);
 void measurements(coord*,coord*,double*,int,int);
@@ -96,6 +98,7 @@ int main () {
     for(T=0; T<TMAX; T++){
       particelswalk(site, particels, truesite, Dnarrow, Snarrow, N);
       if((T % WIDTH) == 0) measurements(truesite, initsite, meanDR2, T/WIDTH, N);
+      somme(site);
     }
     
     #ifdef VISUAL_MODE
@@ -110,8 +113,8 @@ int main () {
   fprintf(output1, "#deltaRquadro(t)\n");
   for(i=1; i<MEASURES; i++){
     meanDR2[i]/=NSTORIES;
-    fprintf(output1, "%lf\n", meanDR2[i]);
-    printf("%lf\n", meanDR2[i]);
+    fprintf(output1, "%lf\n", 1./meanDR2[i]);
+    printf("%lf\n", 1./meanDR2[i]);
   }
 
 
@@ -182,6 +185,14 @@ void check(pos site[L][L]){
   for(x=0; x<L; x++) for(y=0; y<L; y++) if(site[x][y] > RHO*L*L) errori(101);
 }
 
+void somme(pos site[L][L]){
+  int x, y, p=0;
+  for(x=0; x<L; x++) for(y=0; y<L; y++) if(site[x][y] > 0) p++;
+  if(p>(RHO*L*L)) {
+    printf("particels:%d\n", p);
+    errori(99);
+  }
+}
 ////////////////////////////////////////////////////////////////////////////////
 //***************************PARTICEL WALK FUNCTION***************************//
 ////////////////////////////////////////////////////////////////////////////////
