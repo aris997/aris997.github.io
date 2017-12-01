@@ -5,7 +5,7 @@
 #include <time.h>
 
 #define L 80
-#define RHO 0.25
+#define RHO 0.2
 #define MEASURES (TMAX/WIDTH)
 #define TMAX 2000
 #define WIDTH 10
@@ -213,7 +213,7 @@ void particelswalk(pos site[L][L], coord particels[], coord truesite[], long int
   x = particels[p].x;
   y = particels[p].y;
   
-  #ifdef VERBOSE_MODE
+  #ifdef LOG_MODE
   printf("p:%d\tdir:%d", p, r);
   printf("\tsite:%lld\tx:%d\ty:%d", site[x][y], x, y);
   #endif
@@ -246,7 +246,7 @@ void particelswalk(pos site[L][L], coord particels[], coord truesite[], long int
     particels[p].x = Snarrow[x];
     truesite[p].x--;
   }
-  #ifdef VERBOSE_MODE
+  #ifdef LOG_MODE
   else {
     printf("\t0");
   }
