@@ -9,7 +9,7 @@
 #define MEASURES (TMAX/WIDTH)
 #define TMAX 2000
 #define WIDTH 10
-#define NSTORIES 1000
+#define NSTORIES 10
 
 //RODARI-RIVA   30 NOVEMBRE 2017    v1.0.0    labfc409
 
@@ -59,7 +59,7 @@ int main () {
   double rho = RHO;
   steps T, i;
   int L2 = L*L;
-  pos N = L2*rho;
+  pos N = (int)L2*rho;
 
   #ifdef VERBOSE_MODE
   printf("Particels: %lld\n", N);
@@ -255,6 +255,7 @@ void measurements(coord truesite[], coord initsite[], double meanDR2[], int t, i
   double R2=0.;
   for(p=1; p<=N; p++){
     R2 += pow((truesite[p].x-initsite[p].x),2) + pow((truesite[p].y-initsite[p].y),2);
+    if(t < 21) printf("x:%lld y:%lld d:%lf\n", truesite[p].x, truesite[p].y, pow((truesite[p].x-initsite[p].x),2) + pow((truesite[p].y-initsite[p].y),2) );
   }
   R2/=(double)N;
   meanDR2[t+1] += R2;
@@ -275,6 +276,7 @@ void fprinter(pos site[L][L]){
 }
 
 void errori(int n){
+  
   if (n == 100){ //calloc wrong
     printf("ERROR 100\nCALLOC PROBLEMS\n");
   }
@@ -284,5 +286,6 @@ void errori(int n){
   else if(n == 101){
     printf("REVIEW DEFINES, U MADE A MISTAKE\n");
   }
+
   exit(-1);
 }

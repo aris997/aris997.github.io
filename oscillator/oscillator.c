@@ -10,7 +10,7 @@
 /********OSCILLATORE ARMONICO********/
 //note di sviluppo
 //- algoritmi implementati: EULERO, EULERO-CROMER, PUNTO CENTRALE, MEZZO PASSO
-//- GNUPLOT AUTOMATICO SE DEFINITO DA GCC (INOLTRE CREA UNO SCRIPT SE NON ESISTE)
+//- GNUPLOT AUTOMATICO SE DEFINITO DA GCC (INOLTRE CREA UNO SCRIPT SE NON ESISTE)  "-D GNUPLOT"
 //- L'ALGORITMO USATO VIENE SCELTO DALL'UTENTE OGNI VOLTA (IL SISTEMA DI SCELTA PREVEDE PUNTATORI A FUNZIONI)
 //- DAL FILE INPUT È POSSIBILE ESEGUIRE PIÙ CASI, RICORDARE DI CAMBIARE IL VALORE
 //  DEL DEFINE "INPUT_ROWS" PER LEGGERE PIÙ RIGHE DEL FILE INPUT
@@ -56,10 +56,6 @@ int main(int argc, char *argv[]){
 
   struct vector (*algorithm)(vector, double, double, index); //defining the pointer to function
 
-  input = fopen("input.dat", "r");
-  if (input == NULL) {errori(404); exit(-1);} //if input dows not exist it's a segmentation fault
-  output_energy = fopen("energy.dat", "w");
-  
   do {
     printf("#Choose the algorithm to process:\n#(0)Eulero, (1)Eulero-Cromer, (2)Central_Point, (3)HalfStep\n");
     scanf("%d", &select);
@@ -70,7 +66,17 @@ int main(int argc, char *argv[]){
   else if (select == 3) algorithm = halfstep;
   else algorithm = eulero;
 
-  for(ii=0; ii<INPUT_ROWS; ii++){ // i < numero di righe di stati iniziali
+  do {
+    printf("")
+  }
+
+  input = fopen("input.dat", "r");
+  if (input == NULL) {errori(404); exit(-1);} //if input does not exist it's a segmentation fault
+  output_energy = fopen("energy.dat", "w");
+  
+
+
+  for(ii=0; ii<INPUT_ROWS; ii++){ // ii number of input row rolling
     
     fscanf(input, "%lf %lf %lf %lf %lf", &state.x, &state.v, &omega2, &dt, &tmax);
 
