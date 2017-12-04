@@ -4,10 +4,10 @@
 #include <math.h>
 #include <time.h>
 
-#define L 80
+#define L 40
 #define RHO 0.6
 #define MEASURES (TMAX/WIDTH)
-#define TMAX 10000
+#define TMAX 1000
 #define WIDTH 10
 #define NSTORIES 100
 #define D 2
@@ -39,9 +39,12 @@ typedef struct coord{
 void init(int [][L]);
 void initNeighbor(long int*,long int*);
 
+void calcheck_d(double*);
+void calcheck_c(coord*);
+
 int main () {
 
-  srand48(time(NULL));
+  srand(time(NULL));
 
   //static int MEASURES = TMAX/WIDTH;
   //static int L = 20;
@@ -54,14 +57,12 @@ int main () {
   pos x, y;
 
   coord *initpos, *truepos, *condpos;
-
-  srand48(time(NULL));
   
   int site[L][L];
 
   double *RWSUM, *RW;
   RWSUM = (double *) calloc(TMAX, sizeof(double));
-
+  calcheck_d(RWSUM);
 
 
   long int plus[L], less[L];
@@ -74,6 +75,7 @@ int main () {
     truepos = (coord *) calloc(L*L, sizeof(coord));
     condpos = (coord *) calloc(L*L, sizeof(coord));
     RW = (double *) calloc(TMAX, sizeof(double));
+    calcheck_d(RW);
 
     N = 0; //particelle inserite a ogni step
 
@@ -194,4 +196,20 @@ void initNeighbor(long int plus[], long int less[]){
 
   plus[L-1] = 0;
   less[0] = L - 1; 
+}
+
+void calcheck_d(double array[]){
+  if (array == NULL){
+    printf("ERROR calloc of double size not set\ngo back home, it's cold outside\n");
+    exit(-1);
+  }
+  return;
+}
+
+void calcheck_c(coord array[]){
+  if (array == NULL){
+    printf("ERROR calloc of coord size not set\ngo back home, it's cold outside\n");
+    exit(-1);
+  }
+  return;
 }
