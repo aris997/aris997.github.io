@@ -12,7 +12,7 @@
 #define NSTORIES 100
 #define D 2
 
-//RODARI-RIVA   30 NOVEMBRE 2017    v1.0.0    labfc409
+//RODARI-RIVA   30 NOVEMBRE 2017    v2.0.0    labfc409
 
 /******************************************GAS RETICOLARE******************************************/
 // -    lrand48 genera posizioni casuali nell'intervallo (0,L), si tiene conto della particella
@@ -169,6 +169,9 @@ int main () {
 
   exit(0);
 }
+
+
+
 
 void init(int site[L][L]){
   
