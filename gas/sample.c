@@ -4,7 +4,7 @@
 
 #define MY_EXIT_SUCCESS       0
 #define MY_EXIT_FAILURE      -9
-#define MY_EMPTY        9999999
+#define MY_EMPTY 9999999
 
 #define L 20
 #define NUM_SWEEPS 1000
@@ -56,12 +56,12 @@ int main(void) {
       if(((1+sweep)%MEASUREMENT_PERIOD)==0) {
         double deltaR2;
         deltaR2 = measure(thisN);
-        #ifdef MY_DEBUG
+#ifdef MY_DEBUG
         if(numMeasure>=NUM_MEASUREMENTS) {
           printf("Errore: numMeasure e' troppo grande\n");
           exit(MY_EXIT_FAILURE);
         }
-        #endif
+#endif
         averageDeltaR2[numMeasure] += deltaR2;
         errorDeltaR2[numMeasure] += (deltaR2 * deltaR2);
         numMeasure++;
@@ -99,23 +99,23 @@ double myInit(void) {
   }
   fprintf(fDat, "# a = %Lu m = 2^64 I0 = %Lu\n", a, seed);
   fprintf(fDat, "# Numero di passi temporali: %d\n",
-  numberOfSweeps);
+          numberOfSweeps);
   fprintf(fDat, "# Numero di campioni: %d\n", numberOfSamples);
   fprintf(fDat, "# Numero di misure: %d\n", NUM_MEASUREMENTS);
   fprintf(fDat, "# Periodo delle misure: %d\n", MEASUREMENT_PERIOD);
 
-  #ifdef MY_DEBUG
+#ifdef MY_DEBUG
   printf("# Debug mode attivo: l'esecuzione e` rallentata.\n");
   fprintf(fDat, "# Debug mode attivo: l'esecuzione e` rallentata.\n");
-  #endif
+#endif
   if(sizeof(RANDOM_TYPE)<8) {
     printf("Errore: RANDOM_TYPE deve avere almeno 8 byte,"
-    " mentre ne ha  %d\n", sizeof(RANDOM_TYPE));
+           " mentre ne ha  %d\n", sizeof(RANDOM_TYPE));
     exit(MY_EXIT_FAILURE);
   }
   if(DIM!=2) {
     printf("Errore: questo programma e' stato verificato,"
-    " solo in D = %d\n", DIM);
+           " solo in D = %d\n", DIM);
     exit(MY_EXIT_FAILURE);
   }
 
@@ -134,9 +134,9 @@ double myInit(void) {
   scanf("%lg", &rho);
   particleNumber = (long) (rho * (double)VOLUME);
   printf("# densita' attesa = %lg numero medio = %ld\n",
-  rho, particleNumber);
+         rho, particleNumber);
   fprintf(fDat, "# densita' attesa = %lg numero medio = %ld\n",
-  rho, particleNumber);
+          rho, particleNumber);
 
   if(rho>=1.0) {
     printf("Errore: rho troppo grande %lg\n", rho);
@@ -173,8 +173,8 @@ void myEnd(double averageRho) {
     }
 
     fprintf(fDat,"%ld %lg %lg\n",
-    i*MEASUREMENT_PERIOD+MEASUREMENT_PERIOD-1,
-    averageDeltaR2[i], errorDeltaR2[i]);
+            i*MEASUREMENT_PERIOD+MEASUREMENT_PERIOD-1,
+            averageDeltaR2[i], errorDeltaR2[i]);
   }
   fclose(fDat);
 }
@@ -240,50 +240,50 @@ void updateLattice(long thisN) {
     y = positionOfParticle[thisParticle][1];
     trueX = positionOfParticle[thisParticle][0];
     trueY = positionOfParticle[thisParticle][1];
-    #ifdef MY_DEBUG
+#ifdef MY_DEBUG
     if( (x >= L) || ( y>= L)
-    || (trueX == MY_EMPTY) || (trueY == MY_EMPTY) ) {
+       || (trueX == MY_EMPTY) || (trueY == MY_EMPTY) ) {
       printf("Errore interno: grande posizione\n");
-      exit(MY_EXIT_FAILURE);
-    }
-    if(particleOfSite[x][y] != thisParticle) {
-      printf("Errore interno: particella indecisa x %ld y %ld P %ld TP %ld\n",
-      x, y, particleOfSite[x][y], thisParticle);
-      exit(MY_EXIT_FAILURE);
-    }
-    #endif
-    if(this_direction == 0) {
-      nX = plusNeighbor[x];
-      nY = y;
-    } else if(this_direction == 1) {
-      nX = minusNeighbor[x];
-      nY = y;
-    } else if(this_direction == 2) {
-      nX = x;
-      nY = plusNeighbor[y];
-    } else if(this_direction == 3) {
-      nX = x;
-      nY = minusNeighbor[y];
-    } else{
-      printf("Errore interno: cattivi vicini\n");
-      exit(MY_EXIT_FAILURE);
-    }
-    if(particleOfSite[nX][nY] == MY_EMPTY) {/* qui cambiamo */
-      particleOfSite[nX][nY] = particleOfSite[x][y];
-      particleOfSite[x][y] = MY_EMPTY;
-      positionOfParticle[thisParticle][0] = nX;
-      positionOfParticle[thisParticle][1] = nY;
-      if(this_direction==0) {
-        truePositionOfParticle[thisParticle][0]++;
-      } else if(this_direction==1) {
-        truePositionOfParticle[thisParticle][0]--;
-      } else if(this_direction==2) {
-        truePositionOfParticle[thisParticle][1]++;
-      } else if(this_direction==3) {
-        truePositionOfParticle[thisParticle][1]--;
-      }
-    }
+    exit(MY_EXIT_FAILURE);
   }
+  if(particleOfSite[x][y] != thisParticle) {
+    printf("Errore interno: particella indecisa x %ld y %ld P %ld TP %ld\n",
+           x, y, particleOfSite[x][y], thisParticle);
+    exit(MY_EXIT_FAILURE);
+  }
+#endif
+  if(this_direction == 0) {
+    nX = plusNeighbor[x];
+    nY = y;
+  } else if(this_direction == 1) {
+    nX = minusNeighbor[x];
+    nY = y;
+  } else if(this_direction == 2) {
+    nX = x;
+    nY = plusNeighbor[y];
+  } else if(this_direction == 3) {
+    nX = x;
+    nY = minusNeighbor[y];
+  } else{
+    printf("Errore interno: cattivi vicini\n");
+    exit(MY_EXIT_FAILURE);
+  }
+    if(particleOfSite[nX][nY] == MY_EMPTY) {/* qui cambiamo */
+  particleOfSite[nX][nY] = particleOfSite[x][y];
+  particleOfSite[x][y] = MY_EMPTY;
+  positionOfParticle[thisParticle][0] = nX;
+  positionOfParticle[thisParticle][1] = nY;
+  if(this_direction==0) {
+    truePositionOfParticle[thisParticle][0]++;
+  } else if(this_direction==1) {
+    truePositionOfParticle[thisParticle][0]--;
+  } else if(this_direction==2) {
+    truePositionOfParticle[thisParticle][1]++;
+  } else if(this_direction==3) {
+    truePositionOfParticle[thisParticle][1]--;
+  }
+}
+}
 }
 
 
