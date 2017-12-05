@@ -4,12 +4,11 @@
 #include <math.h>
 #include <time.h>
 
-#define L 40
-#define RHO 0.6
-#define MEASURES (TMAX/WIDTH)
+#define MEASURES (L)
+#define L 50
+#define RHO 0.2
 #define TMAX 1000
-#define WIDTH 10
-#define NSTORIES 100
+#define NSTORIES 10000
 #define D 2
 
 //RODARI-RIVA   30 NOVEMBRE 2017    v2.0.0    labfc409
@@ -72,10 +71,13 @@ int main () {
   
     init(site); //reticolo azzerato
     initpos = (coord *) calloc(L*L, sizeof(coord));
+    calcheck_c(initpos); //controllo allocazione
     truepos = (coord *) calloc(L*L, sizeof(coord));
+    calcheck_c(truepos); //controllo allocazione
     condpos = (coord *) calloc(L*L, sizeof(coord));
+    calcheck_c(condpos); //controllo allocazione
     RW = (double *) calloc(TMAX, sizeof(double));
-    calcheck_d(RW);
+    calcheck_d(RW); //controllo allocazione
 
     N = 0; //particelle inserite a ogni step
 
@@ -102,47 +104,50 @@ int main () {
 
 
     for(T=0; T<TMAX; T++){
-      
-      label = rand()%N;
-      x = condpos[label].x;
-      y = condpos[label].y;
+        
+      for(k=0; k<N; k++){
 
-      r = rand()%4; //0 - Nord, 1 - Est, 2 - Sud, 3 - Ovest
+        label = rand()%N;
+        x = condpos[label].x;
+        y = condpos[label].y;
 
-      if (r == 0 && site[x][plus[y]] == 0){
-        site[x][plus[y]] = 1;
-        site[x][y] = 0;
-        condpos[label].y = plus[y];
-        truepos[label].y++;
+        r = rand()%4; //0 - Nord, 1 - Est, 2 - Sud, 3 - Ovest
+
+        if (r == 0 && site[x][plus[y]] == 0){
+          site[x][plus[y]] = 1;
+          site[x][y] = 0;
+          condpos[label].y = plus[y];
+          truepos[label].y++;
+        }
+
+        else if (r == 1 && site[plus[x]][y] == 0){
+          site[plus[x]][y] = 1;
+          site[x][y] = 0;
+          condpos[label].x = plus[x];
+          truepos[label].x++;
+        }
+
+        else if (r == 2 && site[x][less[y]] == 0){
+          site[x][less[y]] = 1;
+          site[x][y] = 0;
+          condpos[label].y = less[y];
+          truepos[label].y--;
+        }
+
+        else if (r == 3 && site[less[x]][y] == 0){
+          site[less[x]][y] = 1;
+          site[x][y] = 0;
+          condpos[label].x = less[x];
+          truepos[label].x--;
+        }
       }
 
-      else if (r == 1 && site[plus[x]][y] == 0){
-        site[plus[x]][y] = 1;
-        site[x][y] = 0;
-        condpos[label].x = plus[x];
-        truepos[label].x++;
+      if(T > 0){
+        for (k=0; k<N; k++){
+          RW[T] += pow((truepos[k].x-initpos[k].x),2) + pow((truepos[k].y-initpos[k].y),2);
+        }
+        RW[T] /= N;
       }
-
-      else if (r == 2 && site[x][less[y]] == 0){
-        site[x][less[y]] = 1;
-        site[x][y] = 0;
-        condpos[label].y = less[y];
-        truepos[label].y--;
-      }
-
-      else if (r == 3 && site[less[x]][y] == 0){
-        site[less[x]][y] = 1;
-        site[x][y] = 0;
-        condpos[label].x = less[x];
-        truepos[label].x--;
-      }
-
-      for (k=0; k<N; k++){
-      
-        RW[T] += pow((truepos[k].x-initpos[k].x),2) + pow((truepos[k].y-initpos[k].y),2);
-      }
-      RW[T] /= N;
-
     }
 
 
@@ -162,8 +167,8 @@ int main () {
   FILE *output1;
   output1 = fopen("drho.dat", "w");
   fprintf(output1, "#deltaRquadro(t)\n");
-  for(i=0; i<TMAX; i++){
-    fprintf(output1, "%d %.14lf\n", i+1, ((double)RWSUM[i]/NSTORIES)/(2.*D*(i+1)));
+  for(T=0; T<TMAX; T++){
+    fprintf(output1, "%d %.14lf\n", T, ((double)RWSUM[T]/NSTORIES)/(2.*D*T));
   }
 
   fclose(output1);
