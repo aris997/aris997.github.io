@@ -1,135 +1,131 @@
-#include <limits.h>
 #include <stdlib.h>
-#include <stdint.h>
 #include <stdio.h>
 #include <math.h>
 #include <time.h>
 
-
-#define L (NSTEPS*DIM)
-#define NSTORIES 1
+#define NSTORIES 10000
 #define NSTEPS 1000
-#define NBIN 10
+#define L 2001
 #define DIM 2
 
-#define A (1.)
-
-typedef unsigned long long int number;
-typedef long long int pos;
+#define A 1
 
 typedef struct dim{
-  double x;
-  double y;
+  int x;
+  int y;
 } dim;
 
 struct dim init();
+dim copy(dim);
+int stuck(dim , dim *, int);
+int check(dim , dim *, int);
 
 int main(){
-
-  printf("porcoddio\n");
-
-  int k, i;
-
+  clock_t begin = clock();
   srand(time(NULL));
 
-  //L'ecuyer type 1 64bit (maybe)
-  //number m = (1<<(8*sizeof(number)))-1; //gen the ULLONG_MAX despite the definition 64bit
-  //number a = 1181783497276652981ULL;
-
-  //number ran = time(NULL); //seeding
-  //double inv = 1./(double)m, r;
-
-  number ran;
-
-  double  r, inv = 1./((double)RAND_MAX); 
-
-  dim p; //p è dove si trova
-
-  //dim *somme, *sommeq;
-  
-  int M[L][L];
-
-  // somme = (dim *) calloc(NSTEPS, sizeof(dim));
-  // if (somme == NULL) { printf("calloc error somme"); exit(-1);}
-  // sommeq = (dim *) calloc(NSTEPS, sizeof(dim));
-  // if (sommeq == NULL) { printf("calloc error sommeq"); exit(-1);}
-
-  int x=NSTEPS, y=NSTEPS;
+  int i, k, mov, storie=0, gino[NSTEPS]={0};
+  dim p, newp, *visit;
+  double  r, inv = 1./(double)RAND_MAX, media=0; 
 
   for (i=0; i<NSTORIES; i++){
+
     p = init();
+    mov = 0;
 
-    for(k=0; k<NSTEPS; k++){
+    visit = (dim *) calloc(NSTEPS + 1, sizeof(dim));
+    if(visit == NULL){printf("ERROR CALLOC\n"); exit(0);}
+    
+    for(k = 0; k<NSTEPS; k++){
       
-      if ( M[x+1][y] > 0 && M[x-1][y] > 0 && 
-           M[x][y+1] > 0 && M[x][y+1] > 0 ){
-        k = NSTEPS;
-        printf("intrappolato storia:%d\n", i);
+      newp = copy(p);
+
+      r = (double) rand() * inv;
+
+      if (r < 0.25) { newp.x += A; }
+      else if (r<0.5) { newp.x -= A; }
+      else if (r<0.75) { newp.y += A; }
+      else if (r<=1) { newp.y -= A; }
+      else { printf("Error!\n"); exit(-1);}
+
+      if(check(newp, visit, mov) == 0){
+	//printf("%d %d \n", newp.x, newp.y);
+	p = copy(newp);
+	mov++;
+	visit[mov] = copy(p);
       }
 
-      else{
-        ran = rand();
-        r = (double)ran*inv;
-
-        x = p.x + NSTEPS;
-        y = p.y + NSTEPS;
-
-        if (r<0.25 && M[x+1][y] == 0) { p.x+=A; }
-        else if (r<0.5 && M[x][y+1]) { p.y+=A; }
-        else if (r<0.75 && M[x-1][y] == 0) { p.x-=A; }
-        else if (r<1. && M[x][y-1] == 0) { p.y-=A; }
-
-        x = p.x + NSTEPS;
-        y = p.y + NSTEPS;
-
-        M[x][y] = 1;
-
-        // somme[k].x += p.x;
-        // somme[k].y += p.y;
-        // sommeq[k].x += p.x*p.x;
-        // sommeq[k].y += p.y*p.y;
-
+      if(stuck(p, visit, mov) >= 4){
+	//printf("La storia %d si conclude allo step %d \n", i+1, k+1);
+	media+=mov;
+	storie++;
+	gino[k]++;
+	k = NSTEPS;
       }
     }
+ 
+    free(visit);
   }
 
-  FILE *output2;
-  output2 = fopen("walkpath.dat", "w");
-
-  for(x=0; x<L; x++){
-    for(y=0; y<L; y++){
-      if(M[x][y] == 1)fprintf(output2, "%d %d\n", x, y);
-    }
-  }
-
-  fclose(output2);
-
-/*
-  double iNSTORIES = 1./(double)NSTORIES;
+  int ginohelper;
 
   FILE *output1;
-  output1 = fopen("walkmean.dat", "w");
-
+  output1 = fopen("gino.dat", "w");
+  
   for(i=0; i<NSTEPS; i++){
-    somme[i].x *= iNSTORIES;
-    somme[i].y *= iNSTORIES;
-    sommeq[i].x *= iNSTORIES;
-    sommeq[i].y *= iNSTORIES;
-    fprintf(output1, "%d %lf %lf %lf %lf\n", i, somme[i].x, somme[i].y, sommeq[i].x, sommeq[i].y);
+    ginohelper=0;
+    for(k=0; k<=i; k++){
+      ginohelper+=gino[k];
+    }
+    fprintf(output1, "%d %lf\n", i, (double)ginohelper/NSTORIES);
   }
 
+  printf("Il punto finale medio e' %lf, %d storie su %d\n", media/(double)storie, storie, NSTORIES);
+    
   fclose(output1);
-  free(somme);
-  free(sommeq);
-  //system("gnuplot < baleator.gp");
-*/
 
+  clock_t end = clock();
+  printf("execution time:%lf\n", (double)(end-begin)/CLOCKS_PER_SEC);
   exit(0);
+}
+
+int stuck(dim pos, dim visit[], int step){
+  
+  int N = 0, i;
+
+  for(i=0; i<step; i++){
+    if(pos.x == visit[i].x - 1 && pos.y == visit[i].y) N++;
+    else if(pos.x == visit[i].x + 1 && pos.y == visit[i].y) N++;
+    else if(pos.x == visit[i].x && pos.y == visit[i].y + 1) N++;
+    else if(pos.x == visit[i].x && pos.y == visit[i].y - 1) N++;
+  }
+
+  return N;
+
+}
+
+int check(dim pos, dim visit[], int step){
+  
+  int i;
+
+  for(i=0; i<step; i++){
+    if(pos.x == visit[i].x && pos.y == visit[i].y) return 1;
+  }
+
+  return 0;
+  
+}
+
+dim copy(dim old){
+  dim a;
+  a.x = old.x;
+  a.y = old.y;
+  return a;
 }
 
 struct dim init(){
   dim a;
-  a.x = 0.;
-  a.y = 0.;
+  a.x = 0;
+  a.y = 0;
   return a;
 }
