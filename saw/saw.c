@@ -50,43 +50,43 @@ int main(){
 
       if(check(newp, visit, mov) == 0){
 	//printf("%d %d \n", newp.x, newp.y);
-	p = copy(newp);
-	mov++;
-	visit[mov] = copy(p);
-      }
+       p = copy(newp);
+       mov++;
+       visit[mov] = copy(p);
+     }
 
-      if(stuck(p, visit, mov) >= 4){
+     if(stuck(p, visit, mov) >= 4){
 	//printf("La storia %d si conclude allo step %d \n", i+1, k+1);
-	media+=mov;
-	storie++;
-	gino[k]++;
-	k = NSTEPS;
-      }
-    }
+       media+=mov;
+       storie++;
+       gino[k]++;
+       k = NSTEPS;
+     }
+   }
+   
+   free(visit);
+ }
+
+ int ginohelper;
+
+ FILE *output1;
+ output1 = fopen("gino.dat", "w");
  
-    free(visit);
+ for(i=0; i<NSTEPS; i++){
+  ginohelper=0;
+  for(k=0; k<=i; k++){
+    ginohelper+=gino[k];
   }
+  fprintf(output1, "%d %lf\n", i, (double)ginohelper/NSTORIES);
+}
 
-  int ginohelper;
+printf("Il punto finale medio e' %lf, %d storie su %d\n", media/(double)storie, storie, NSTORIES);
 
-  FILE *output1;
-  output1 = fopen("gino.dat", "w");
-  
-  for(i=0; i<NSTEPS; i++){
-    ginohelper=0;
-    for(k=0; k<=i; k++){
-      ginohelper+=gino[k];
-    }
-    fprintf(output1, "%d %lf\n", i, (double)ginohelper/NSTORIES);
-  }
+fclose(output1);
 
-  printf("Il punto finale medio e' %lf, %d storie su %d\n", media/(double)storie, storie, NSTORIES);
-    
-  fclose(output1);
-
-  clock_t end = clock();
-  printf("execution time:%lf\n", (double)(end-begin)/CLOCKS_PER_SEC);
-  exit(0);
+clock_t end = clock();
+printf("execution time:%lf\n", (double)(end-begin)/CLOCKS_PER_SEC);
+exit(0);
 }
 
 int stuck(dim pos, dim visit[], int step){
