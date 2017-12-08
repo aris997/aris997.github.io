@@ -5,7 +5,6 @@
 
 #define NSTORIES 10000
 #define NSTEPS 1000
-#define L 2001
 #define DIM 2
 
 #define A 1
@@ -28,7 +27,7 @@ int main(){
   dim p, newp, *visit;
   double  r, inv = 1./(double)RAND_MAX, media=0; 
 
-  for (i=0; i<NSTORIES; i++){
+  for(i=0; i<NSTORIES; i++){
 
     p = init();
     mov = 0;
@@ -37,7 +36,7 @@ int main(){
     if(visit == NULL){printf("ERROR CALLOC\n"); exit(0);}
     
     for(k = 0; k<NSTEPS; k++){
-      
+
       newp = copy(p);
 
       r = (double) rand() * inv;
@@ -49,21 +48,21 @@ int main(){
       else { printf("Error!\n"); exit(-1);}
 
       if(check(newp, visit, mov) == 0){
-	//printf("%d %d \n", newp.x, newp.y);
+	     //printf("%d %d \n", newp.x, newp.y);
        p = copy(newp);
        mov++;
        visit[mov] = copy(p);
      }
 
      if(stuck(p, visit, mov) >= 4){
-	//printf("La storia %d si conclude allo step %d \n", i+1, k+1);
+	     //printf("La storia %d si conclude allo step %d \n", i+1, k+1);
        media+=mov;
        storie++;
        gino[k]++;
        k = NSTEPS;
      }
    }
-   
+
    free(visit);
  }
 
@@ -71,7 +70,7 @@ int main(){
 
  FILE *output1;
  output1 = fopen("gino.dat", "w");
- 
+
  for(i=0; i<NSTEPS; i++){
   ginohelper=0;
   for(k=0; k<=i; k++){
@@ -81,6 +80,7 @@ int main(){
 }
 
 printf("Il punto finale medio e' %lf, %d storie su %d\n", media/(double)storie, storie, NSTORIES);
+printf("la più breve %d la più lunga %d\n", longest, lightest);
 
 fclose(output1);
 
@@ -90,7 +90,7 @@ exit(0);
 }
 
 int stuck(dim pos, dim visit[], int step){
-  
+
   int N = 0, i;
 
   for(i=0; i<step; i++){
@@ -105,7 +105,7 @@ int stuck(dim pos, dim visit[], int step){
 }
 
 int check(dim pos, dim visit[], int step){
-  
+
   int i;
 
   for(i=0; i<step; i++){
