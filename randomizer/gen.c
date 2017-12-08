@@ -68,109 +68,109 @@ int main(int argc, char **argv){
       sumr += number;
       sumr2 += number*number;
       //printf("%lf\n",number);
-    
+      
       bin = (int)(number*NBIN);
       hist[bin]++;
-    
+      
       if (i%3 == 0) x = number;
       else if (i%3 == 1) y = number;
       else if (i%3 == 2) {
-	z = number;
-	fprintf(output2, "%lf %lf %lf\n", x, y, z);
-      }
-    }
+       z = number;
+       fprintf(output2, "%lf %lf %lf\n", x, y, z);
+     }
+   }
 
     //DATI PER ISTOGRAMMA
-    for(i=0; i<NBIN; i++){
-      fprintf(output1,"%ld %ld\n", i, hist[i]);
-      phi += hist[i]*hist[i];
-    }
+   for(i=0; i<NBIN; i++){
+    fprintf(output1,"%ld %ld\n", i, hist[i]);
+    phi += hist[i]*hist[i];
   }
+}
 
-  
-  else if (chooser == 1) {
+
+else if (chooser == 1) {
       //SHIFT REGISTER
 
       //INIZIALIZZAZIONE
 
-      addB = 31;
-      addC = 0;
+  addB = 31;
+  addC = 0;
 
-      for (i=0; i<1000; i++) lrand48(); 
+  for (i=0; i<1000; i++) lrand48(); 
 
-      for (i=0; i<SHIFT; i++) SR[i]=0;
+    for (i=0; i<SHIFT; i++) SR[i]=0;
 
       for (i=0; i<SHIFT; i++){
-	for (j=0; j<8*sizeof(RANDOM); j++){
-	  number = (double)lrand48()/(double)RAND_MAX;
-	  if (number < 0.5) {
-	    THEBIT = 1;
-	  }
-	  else {
-	    THEBIT = 0;
-	  }
-	  SR[i] = SR[i] | (THEBIT << j);
-	}
-      }
+       for (j=0; j<8*sizeof(RANDOM); j++){
+         number = (double)lrand48()/(double)RAND_MAX;
+         if (number < 0.5) {
+           THEBIT = 1;
+         }
+         else {
+           THEBIT = 0;
+         }
+         SR[i] = SR[i] | (THEBIT << j);
+       }
+     }
 
       //GENERAZIONE
 
-      for (i=0; i<NMAX; i++){
-	r = SR[addB] ^ SR[addC];
+     for (i=0; i<NMAX; i++){
+       r = SR[addB] ^ SR[addC];
 
-	SR[addC] = r;
-	addC++;
-	addB++;
-	if (addB == SHIFT) addB = 0;
-	if (addC == SHIFT) addC = 0;
+       SR[addC] = r;
+       addC++;
+       addB++;
+       if (addB == SHIFT) addB = 0;
+       if (addC == SHIFT) addC = 0;
 
-	number = (double)r / (double)ULLONG_MAX;
+       number = (double)r / (double)ULLONG_MAX;
 
-	sumr += number;
-	sumr2 += number*number;
+       sumr += number;
+       sumr2 += number*number;
 	//printf("%lf\n",number);
 
-	bin = (int)(number*NBIN);
-	hist[bin]++;
+       bin = (int)(number*NBIN);
+       hist[bin]++;
 
-	if (i%3 == 0) x = number;
-	else if (i%3 == 1) y = number;
-	else if (i%3 == 2) {
-	  z = number;
-	  fprintf(output2, "%lf %lf %lf\n", x, y, z);
-	}
-      }
+       if (i%3 == 0) x = number;
+       else if (i%3 == 1) y = number;
+       else if (i%3 == 2) {
+         z = number;
+         fprintf(output2, "%lf %lf %lf\n", x, y, z);
+       }
+     }
 
 
 
       //DATI PER ISTOGRAMMA
-      for(i=0; i<NBIN; i++){
-	fprintf(output1,"%ld %ld\n", i, hist[i]);
-	phi += hist[i]*hist[i];
-      }
-    }
+     for(i=0; i<NBIN; i++){
+       fprintf(output1,"%ld %ld\n", i, hist[i]);
+       phi += hist[i]*hist[i];
+     }
+   }
 
   //METODI STATISTICI
-  media = sumr/(double)NMAX;
-  varianza = (sumr2 + (double)NMAX * media * media - 2. * media * sumr)/(double)(NMAX - 1);
-  chi = (double)phi * (double)NBIN/(double)NMAX - (double)NMAX;
+   media = sumr/(double)NMAX;
+   varianza = (sumr2 + (double)NMAX * media * media - 2. * media * sumr)/(double)(NMAX - 1);
+   chi = (double)phi * (double)NBIN/(double)NMAX - (double)NMAX;
 
 
-  printf("media: %lf varianza: %lf chi su %d GDL: %lf\n", media, varianza, NBIN-1, chi);
+   printf("media: %lf varianza: %lf chi su %d GDL: %lf\n", media, varianza, NBIN-1, chi);
 
- 
+   
 
 
-  fclose(output1);
-  fclose(output2);
- 
+   fclose(output1);
+   fclose(output2);
+   
 
-  clock_t end = clock();
+   clock_t end = clock();
   //printf("%.20lf\n %.20lf %ld\n",(double)end,(double)begin, CLOCKS_PER_SEC);
 
-  double execution_time = (double)(end - begin)/CLOCKS_PER_SEC;
-  printf("Execution time: %lf\n", execution_time);
+   double execution_time = (double)(end - begin)/CLOCKS_PER_SEC;
+   printf("Execution time: %lf\n", execution_time);
 
-  exit(0);
+   exit(0);
 
-}
+ }
