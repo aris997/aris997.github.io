@@ -1,0 +1,39 @@
+PROGRAMMI FISCOMP
+
+-	  Integratori numerici:
+	  - Eulero
+	  - Eulero-Cromer
+	  - Mezzo Passo
+	  - Leapfrog
+	  - Velocity Verlet
+	  - RK2
+	  - RK4
+
+-	  Implementarli tutti sull'oscillatore armonico semplice:
+	  - studio traiettorie e confronto con risultato analitico
+	  - errore di integrazione
+	  - studio del periodo dell'oscillatore
+
+-	  Studio del pendolo caotico (prima solo smorzato e poi anche forzato):
+	  - Spazi delle fasi
+	  - Sezioni di Poincare
+	  - Bacini di accumulazione
+	  - Diagrammi di biforcazione
+
+-	  Generatori di numeri casuali:
+	  - GCL
+	  - RANDU
+	  - rand(); drand48()
+	  - Test statistici, media varianza e chi quadro
+	  - Box-Muller: numeri casuali distribuiti normalmente
+	  - Registri a scorrimento
+
+-	  Random-Walk:
+	  - Cammino in 1D e 2D
+	  - Studio istogrammi posizione a tempo TMAX
+	  - Studio probabilità di ritorno a 0
+	  - Verifica di <x^2> \approx t
+	  - SAW: probabilità di intrappolamento
+
+-	  Gas Reticolare:
+	  - coefficiente di diffusione e limite asintotico del comportamento
