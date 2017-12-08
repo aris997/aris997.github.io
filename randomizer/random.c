@@ -12,7 +12,7 @@ typedef unsigned long long int ullint;
 typedef long int lint;
 
 void error(int);
-int statistica();
+int statistica(double,double sum,double sum2,ullint,FILE*);
 
 int main(){
 
@@ -110,19 +110,11 @@ int main(){
       
       r = ( a * r ) % m;    //il GCL
       ran = (double)r * invM;
-      
-      sum += ran;       //statistiche
-      sum2 += ran*ran;
-
-      bin = (int)(ran*BIN);
+    
+      bin = statistica(ran, sum, sum2, i, output1);
       hist[bin]++;
 
-      if(i%3 == 0) x = ran;
-      else if(i%3 == 1) y = ran;
-      else if(i%3 == 2){
-        z = ran;
-        fprintf(output1, "%lf %lf %lf\n", x, y, z);
-      }
+
     }
 
     fclose(output1);
@@ -284,13 +276,27 @@ int main(){
 }
 
 
-int statistica(double ran, ){
+int statistica(double ran, double sum, double sum2, ullint i, FILE *output){
 
+  double x;
+  double y;
+  double z;
 
+  sum += ran;
+  sum2 += ran*ran;
 
+  if(i%3 == 0){
+    x = ran;
+  }
+  else if(i%3 == 1){
+    y = ran;
+  }
+  else if(i%3 == 2){
+    z = ran;
+    fprintf(output, "%lf %lf %lf\n", x, y, z);
+  }
 
-
-  return bin;
+  return (int)(ran*BIN);
 }
 
 
