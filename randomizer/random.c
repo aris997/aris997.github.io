@@ -12,7 +12,7 @@ typedef unsigned long long int ullint;
 typedef long int lint;
 
 void error(int);
-int statistica(double,double sum,double sum2,ullint,FILE*);
+int statistica(double,double*,double*,ullint,FILE*);
 
 int main(){
 
@@ -42,18 +42,16 @@ int main(){
           "Scegli meglio: ");
   }while(flag < 0 || flag > 5);
 
-  ullint i;
+  register ullint i;
 
   double ran;
   double sum=0, sum2=0;
   double INV_RANDMAX = 1./RAND_MAX;
 
-
   lint *hist;
   hist = (lint *)calloc(BIN, sizeof(lint));
   if(hist == NULL){error(101);}
   int bin;
-  double x, y, z;
 
 /*********************************************************************************/
   
@@ -70,7 +68,6 @@ int main(){
       m = (1ULL << 31) - 1ULL;
       a = 16807;
       seed = 756431;
-
       invM = 1./(double)m;
 
       output1 = fopen("minimalstd.dat", "w");
@@ -85,15 +82,13 @@ int main(){
       seed = time(NULL);
       invM = 1./(double)m;
 
-
       output1 = fopen("randu.dat", "w");
       if (output1 == NULL){error(100);}
     }
 
-    if(flag == 2){
+    if(flag == 2){ //L'ecuyer type:1 -> 64bit
 
       printf("#\n# L'Ecuyer type:1 64bit\n#\n");
-
       m = ULLONG_MAX;//( 1 << 64 ) - 1;
       a = 1181783497276652981ULL;
       seed = time(NULL);
@@ -105,18 +100,14 @@ int main(){
 
     ullint r = seed % m; //inizializzazione I_0
 
-
     for(i=0; i<MAX; i++){
       
       r = ( a * r ) % m;    //il GCL
       ran = (double)r * invM;
     
-      bin = statistica(ran, sum, sum2, i, output1);
+      bin = statistica(ran, &sum, &sum2, i, output1);
       hist[bin]++;
-
-
     }
-
     fclose(output1);
   }
 
@@ -127,31 +118,25 @@ int main(){
 
     if(flag == 2){
 
+      printf("# rand()\n");
+
       FILE *output2;
       output2 = fopen("rand.dat", "w");
       if(output2 == NULL){error(100);}
 
       for(i=0; i<MAX; i++){
-        ran = rand()*INV_RANDMAX;
-          
-        sum += ran;       //statistiche
-        sum2 += ran*ran;
 
-        bin = (int)(ran*BIN);
+        ran = rand()*INV_RANDMAX;
+        bin = statistica(ran, &sum, &sum2, i, output2);
         hist[bin]++;
 
-        if(i%3 == 0) x = ran;
-        else if(i%3 == 1) y = ran;
-        else if(i%3 == 2){
-          z = ran;
-          fprintf(output2, "%lf %lf %lf\n", x, y, z);
-        }
       }
       fclose(output2);
     }
 
     else if(flag == 3){
 
+      printf("# lrand48()\n");
       FILE *output3;
       output3 = fopen("lrand48.dat", "w");
       if(output3 == NULL){error(100);}
@@ -159,25 +144,17 @@ int main(){
       for(i=0; i<MAX; i++){
 
         ran = lrand48()*INV_RANDMAX;
-
-        sum += ran;       //statistiche
-        sum2 += ran*ran;
-
-        bin = (int)(ran*BIN);
+        bin = statistica(ran, &sum, &sum2, i, output3);
         hist[bin]++;
 
-        if(i%3 == 0) x = ran;
-        else if(i%3 == 1) y = ran;
-        else if(i%3 == 2){
-          z = ran;
-          fprintf(output3, "%lf %lf %lf\n", x, y, z);
-        }
       }
       fclose(output3);
     }
   }
 /*********************************************************************************/
   else if(flag == 5){ //  SHIFT REGISTER
+
+    printf("# Shift-Register [inizializzato con lrand48()]\n");
 
     int addB = 31;
     int addC = 0;
@@ -224,82 +201,54 @@ int main(){
     
       ran = (double)r/(double)ULLONG_MAX;
 
-      sum += ran;
-      sum2 += ran*ran;
-
-      bin = (int)(ran*BIN);
+      bin = statistica(ran, &sum, &sum2, i, output5);
       hist[bin]++;
-
-      if(i%3 == 0) x = ran;
-      else if(i%3 == 1) y = ran;
-      else if(i%3 == 2){
-        z = ran;
-        fprintf(output5, "%lf %lf %lf\n", x, y, z);
-      }
     }
     free(SR);
     fclose(output5);
   }
 
-
-
+  //*****************************************************
+  //ISTOGRAMMA in outputH - 
   FILE *outputH;
   outputH = fopen("hist.dat", "w");
   if(outputH == NULL){error(100);}
 
   ullint phi;
 
-  //DATI PER ISTOGRAMMA
   for(i=0; i<BIN; i++){
     fprintf(outputH,"%lld %ld\n", i, hist[i]);
     phi += hist[i]*hist[i];
   }
+
   free(hist);
   fclose(outputH);
+  //*****************************************************
 
-  //METODI STATISTICI
+  //Completamento della statistica
   double media = sum/(double)MAX;
   double varianza = (sum2 + (double)MAX * media * media - 2. * media * sum)/(double)(MAX - 1);
   double chi = (double)phi * (double)BIN/(double)MAX - (double)MAX;
-
-
   printf("media: %lf varianza: %lf chi su %u GDL: %lf\n", media, varianza, BIN-1, chi);
-
-
-
 
   #ifdef CRONO
     clock_t end = clock();
     printf("Execution time:%lf\n", (double)(end-begin)/CLOCKS_PER_SEC);
   #endif    
+
   exit(0);
 }
 
+int statistica(double ran, double *sum, double *sum2, ullint i, FILE *output){
 
-int statistica(double ran, double sum, double sum2, ullint i, FILE *output){
+  (*sum) += ran;
+  (*sum2) += ran*ran;
 
-  double x;
-  double y;
-  double z;
-
-  sum += ran;
-  sum2 += ran*ran;
-
-  if(i%3 == 0){
-    x = ran;
-  }
-  else if(i%3 == 1){
-    y = ran;
-  }
-  else if(i%3 == 2){
-    z = ran;
-    fprintf(output, "%lf %lf %lf\n", x, y, z);
-  }
+  fprintf(output, "%lf ", ran);
+  if(i%3 == 2) fprintf(output, "\n");
 
   return (int)(ran*BIN);
 }
-
-
 
 void error(int errore){
   if(errore == 100){
