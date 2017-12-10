@@ -4,10 +4,10 @@
 #include <time.h>
 #include <math.h>
 
-#define MEDIA 10
+#define MEDIA 100
 #define SHIFT 1000
 #define MAX 1000000
-#define BIN 96
+#define BIN 101
 
 typedef unsigned long long int ullint;
 typedef long int lint;
@@ -26,7 +26,7 @@ int main(){
 
   if(sizeof(ullint) < 8){ error(64); }
 
-  printf( "#\n# \tGenereratori di numeri pseudocasuali\n#\n"
+  /*printf( "#\n# \tGenereratori di numeri pseudocasuali\n#\n"
           "# In questo codice sono implementati:\n"
           "# (0) GCL Minimal Standard, (1) RANDU, (2) L'ecuyer [64bit], (3) rand(),\n"
           "# (4) drand48(), (5) Shift-Register.\n"
@@ -34,7 +34,7 @@ int main(){
           "# Si applicano test statistici: media, varianza, CHI quadro\n"
           "# Box-Muller (numeri casuali distribuiti normalmente\n"
           "# Sceglire quale generatore analizzare: ");
-
+*/
   int flag, choice, stories=1;
 
   do{
@@ -88,7 +88,7 @@ int main(){
 
         if(flag == 0){  //GCL - MINIMAL STANDARD
           
-          printf("#\n# GCL - Minimal Standard - FIXED SEED\n");
+          //printf("#\n# GCL - Minimal Standard - FIXED SEED\n");
           m = (1ULL << 31) - 1ULL;
           a = 16807;
           seed = 756431;
@@ -99,7 +99,7 @@ int main(){
 
         if(flag == 1){  //GCL - The infamous RANDU
 
-          printf("#\n# GCL - RANDU\n");
+          //printf("#\n# GCL - RANDU\n");
           m = (1ULL << 31);
           a = 65539;
           seed = time(NULL);
@@ -110,7 +110,7 @@ int main(){
 
         if(flag == 2){ //L'ecuyer type:1 -> 64bit
 
-          printf("#\n# L'Ecuyer type:1 64bit\n");
+          //printf("#\n# L'Ecuyer type:1 64bit\n");
           m = ULLONG_MAX;//( 1 << 64 ) - 1;
           a = 1181783497276652981ULL;
           seed = time(NULL);
@@ -139,7 +139,7 @@ int main(){
 
         if(flag == 3){
 
-          printf("#\n# rand()\n");
+          //printf("#\n# rand()\n");
 
           FILE *output3;
           output3 = fopen("rand.dat", "w");
@@ -157,7 +157,7 @@ int main(){
 
         else if(flag == 4){
 
-          printf("#\n# lrand48()\n");
+          //printf("#\n# lrand48()\n");
           FILE *output4;
           output4 = fopen("lrand48.dat", "w");
           if(output4 == NULL){error(100);}
@@ -175,7 +175,7 @@ int main(){
       /*********************************************************************************/
       else if(flag == 5){ //  SHIFT REGISTER
 
-        printf("#\n# Shift-Register [inizializzato con lrand48()]\n");
+        //printf("#\n# Shift-Register [inizializzato con lrand48()]\n");
 
         int addB = 31;
         int addC = 0;
@@ -255,7 +255,7 @@ int main(){
       double varianza = (sum2 + (double)MAX * media * media - 2. * media * sum)/(double)(MAX - 1);
       double chi = (double)phi * (double)BIN/(double)MAX - (double)MAX;
 
-      printf("# Storia[%d]\tmedia: %lf, varianza: %lf, chi su %u GdL: %lf\n", S+1, media, varianza, BIN-1, chi);
+      //printf("# Storia[%d]\tmedia: %lf, varianza: %lf, chi su %u GdL: %lf\n", S+1, media, varianza, BIN-1, chi);
       
 
       chiq[flag]+=chi;
