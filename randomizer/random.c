@@ -4,7 +4,7 @@
 #include <time.h>
 #include <math.h>
 
-#define SHIFT 64
+#define SHIFT 1000
 #define MAX 10000
 #define BIN 10
 
