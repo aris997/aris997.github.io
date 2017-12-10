@@ -4,7 +4,7 @@
 #include <time.h>
 #include <math.h>
 
-#define SHIFT 1000
+#define SHIFT 64
 #define MAX 10000
 #define BIN 10
 
@@ -33,21 +33,23 @@ int main(){
           "# Box-Muller(numeri casuali distribuiti normalmente\n"
           "# Sceglire quale generatore analizzare: ");
 
-  int flag, stories=1;
+  int flag, choice, stories=1;
 
   do{
-    scanf("%d", &flag);
-    if (flag < 0 || flag > 6) printf( "\n# (0) GCL, (1) RANDU, "
+    scanf("%d", &choice);
+    if (choice < 0 || choice > 6) printf( "\n# (0) GCL, (1) RANDU, "
                                       "(2) rand(), (3) drand48(), (4) Shift-Register\n"
           "# (5) L'ecuyer [64bit] [Per analizzarli tutti forse aggiorniamo.]\n"
           "Scegli meglio: ");
-  }while(flag < 0 || flag > 6);
+  }while(choice < 0 || choice > 6);
 
-  if(flag == 6) stories = 6;
+  if(choice == 6) stories = 6;
 
   register ullint i;
 
   for(flag=0; flag<stories; flag++){ /////CICLO PER TUTTI GLI ALGORITMI/////////////////////////
+
+    if(choice < 6)flag = choice;
 
     double ran;
     double sum=0, sum2=0;
@@ -172,6 +174,7 @@ int main(){
       if(output5 == NULL){error(100);}
 
       ullint *SR, r;
+
       SR = (ullint *) calloc(SHIFT, sizeof(ullint));
       if(SR == NULL) {error(101);}
 
@@ -203,6 +206,8 @@ int main(){
       
         ran = (double)r/(double)ULLONG_MAX;
 
+        printf("addC:%d addB:%d %llu %llu %.20lf\n", addC, addB, r, ULLONG_MAX, ran);
+
         bin = statistica(ran, &sum, &sum2, i, output5);
         hist[bin]++;
       }
@@ -226,6 +231,7 @@ int main(){
     for(i=0; i<BIN; i++){
       fprintf(outputH,"%lld %ld\n", i, hist[i]);
       phi += hist[i]*hist[i];
+      if(flag == 5) printf("%ld %llu\n", hist[i], phi);
     }
 
     free(hist);
