@@ -1,0 +1,11 @@
+CHI QUADRO - ALGORITMI
+
+100 gradi di libertà, mediato su 100 chi quadro e 
+1000000 di estrazioni di numeri pseudocasuali per ogni algoritmo.
+
+Minimi quadrati	103.710940
+RANDU			101.672469
+L'ecuyer64bit	103.156331
+rand()			99.474131
+rand48()		99.574942
+ShiftRegister	99.948078
