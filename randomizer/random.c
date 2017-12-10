@@ -167,13 +167,11 @@ int main(){
 
       int k;
 
-      int THEBIT;
-
       FILE *output5;
       output5 = fopen("shiftregister.dat", "w");
       if(output5 == NULL){error(100);}
 
-      ullint *SR, r;
+      ullint *SR, r, THEBIT;
 
       SR = (ullint *) calloc(SHIFT, sizeof(ullint));
       if(SR == NULL) {error(101);}
