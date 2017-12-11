@@ -6,10 +6,10 @@
 
 #define PI 3.1415926535897932384626433832795
 
-#define MEDIA 1
+#define MEDIA 10
 #define SHIFT 1000
-#define MAX 1000
-#define BIN 10
+#define MAX 1000000
+#define BIN 101
 
 typedef unsigned long long int ullint;
 typedef long int lint;
@@ -28,41 +28,55 @@ int main(){
 
   if(sizeof(ullint) < 8){ error(64); }
 
-  printf( "#\n# \tGENERERATORI DI NUMERI PSEUDOCASUALI\n#\n"
-
+  printf( "#\n# \tGenereratori di numeri pseudocasuali\n#\n"
+          "# In questo codice sono implementati:\n"
+          "# (0) GCL Minimal Standard, (1) RANDU, (2) L'ecuyer [64bit], (3) rand(),\n"
+          "# (4) drand48(), (5) Shift-Register.\n"
+          "# (6) eseguire TUTTI gli algoritmi (richiede più tempo)\n#\n"
           "# Si applicano test statistici: media, varianza, CHI quadro\n"
-          "# e media dei CHI quadro.\n"
-          "# Vengono stampati su file i dati per\n"
-          "# plottare Istogrammi su gnuplot e dati per analizzare i\n"
-          "# generatori con coordinate:\n#\n#\t\t"
-          " x = r_n   y = r_(n+1)   z = r_(n+2).\n#\n"
-          "# Sceglire quale generatore analizzare,\n"
-          "# in questo codice sono implementati:\n");
+          "# Sceglire quale generatore analizzare: ");
 
-  int flag, choice, stories=1;
+  int flag, choice, stories=1, distribution;
 
   do{
-    printf("# (0) GCL MinSTD, (1) RANDU, (2) L'ecuyer [64bit], (3) rand(),\n"
-           "# (4) drand48(), (5) Shift-Register,\n"
-           "# Scegliere (6) per eseguirli tutti\n# ");
     scanf("%d", &choice);
+    if (choice < 0 || choice > 6) printf( "\n# (0) GCL, (1) RANDU, "
+                                      "(2) rand(), (3) drand48(), (4) Shift-Register\n"
+          "# (5) L'ecuyer [64bit] [Per analizzarli tutti forse aggiorniamo.]\n"
+          "Scegli meglio: ");
   }while(choice < 0 || choice > 6);
 
   if(choice == 6) stories = 6;
+  
+  do{
+    printf("# Generare distribuzione (0) Uniforme (1) Normale:\n");
+    scanf("%d\n", &distribution);
+  }while(distribution < 0 || distribution > 1);
+
 
   register ullint i;
 
+  double *chiq; //calcolo le medie del chiquadro 
+  chiq = (double *) calloc(stories, sizeof(double));
+  if(chiq == NULL){error(101);}
 
-  for(flag=0; flag<stories; flag++){ /////////CICLO PER TUTTI GLI ALGORITMI/////////////////////////
+  double *chiq2; //calcolo la varianza delle medie del chiquadro 
+  chiq2 = (double *) calloc(stories, sizeof(double));
+  if(chiq2 == NULL){error(101);}
+
+  for(flag=0; flag<stories; flag++){ /////CICLO PER TUTTI GLI ALGORITMI/////////////////////////
 
     if(choice < 6)flag = choice;
     int S = 0; //Variabile di controllo scorrimento del ciclo delle medie
-    double chiq = 0;
 
     do { //CICLO DO-WHILE per mediare su CHIquadro
 
 
       double ran = 0;
+      if(distribution == 1){
+        double ran2 = 0;
+        double g1, g2;
+      }
       double sum=0, sum2=0;
       double INV_RANDMAX = 1./RAND_MAX;
 
@@ -73,7 +87,7 @@ int main(){
       if(hist == NULL){error(101);}
       int bin;
 
-      /********************************************************************************************/
+      /*********************************************************************************/
       
       if(flag <= 2){
 
@@ -122,14 +136,35 @@ int main(){
           
           r = ( a * r ) % m;    //il GCL
           ran = (double)r * invM;
+        
+          if(distribution == 1){
+            r = ( a * r ) % m;
+            ran2 = (double)r * invM;
 
-          bin = statistica(ran, &sum, &sum2, i, output1);
+            a1 = sqrt( - 2. * log(ran) );
+            a2 = 2. * PI * ran2;
+
+            g1 = a1 * cos (a2);
+            g2 = a1 * sin (a2);
+
+
+            r = ( a * r ) % m;
+
+            if( ( (double)r * invM ) <= 0.5) bin = statistica(ran, &sum, &sum2, i, output1);
+            else bin = statistica(ran2, &sum, &sum, i, output1);
+
+          }
+
+          else{
+            bin = statistica(ran, &sum, &sum2, i, output1);
+          }
+          
           hist[bin]++;
         }
         fclose(output1);
       }
 
-      /********************************************************************************************/
+      /*********************************************************************************/
 
       else if(flag <= 4){ // rand() e drand48()
 
@@ -166,7 +201,7 @@ int main(){
         }
       }
 
-      /********************************************************************************************/
+      /*********************************************************************************/
       else if(flag == 5){ //  SHIFT REGISTER
 
         printf("#\n# Shift-Register [inizializzato con lrand48()]\n");
@@ -223,7 +258,7 @@ int main(){
 
       else exit(-1);
 
-      //********************************************************************************************
+      //*****************************************************
       //ISTOGRAMMA in outputH - 
      
       FILE *outputH;
@@ -238,33 +273,36 @@ int main(){
 
       for(i=0; i<BIN; i++){
         fprintf(outputH,"%lld %ld\n", i, hist[i]);
-        phi += hist[i]*hist[i]; //Sfrutto questo ciclo per le somme quadrate necessarie al CHIquadro
+        phi += hist[i]*hist[i];
       }
 
       free(hist);
       fclose(outputH);
-      //********************************************************************************************
+      //*****************************************************
 
       //Completamento della statistica
       double media = sum/(double)MAX;
       double varianza = (sum2 + (double)MAX * media * media - 2. * media * sum)/(double)(MAX - 1);
       double chi = (double)phi * (double)BIN/(double)MAX - (double)MAX;
 
-      printf("# Storia[%d]\tmedia: %lf, varianza:"
-             "%lf, chi su %u GdL: %lf\n", S+1, media, varianza, BIN-1, chi);
+      printf("# Storia[%d]\tmedia: %lf, varianza: %lf, chi su %u GdL: %lf\n", S+1, media, varianza, BIN-1, chi);
       
 
-      chiq+=chi;
+      chiq[flag]+=chi;
+      chiq2[flag]+=chi*chi;
 
       S++; //Variabile di controllo, necessario per mediare ulteriormente sul CHIquadro
     } while(S<MEDIA);
 
 
-    double chiM = chiq/MEDIA;
+    double chiM = chiq[flag]/MEDIA;
 
     printf("#\n# ALGORITMO[%d] media del chi quadro su %u GdL: \t\t\t%lf\n", flag, BIN-1, chiM);
 
-  } //////////////////////////////////FINE CICLO ALGORITMI//////////////////////////////////////////
+  } ////////////////////////////////FINE CICLO ALGORITMI/////////////////////////////////
+
+
+
 
 
   #ifdef CRONO
@@ -272,11 +310,8 @@ int main(){
     printf("# Execution time:%lf\n", (double)(end-begin)/CLOCKS_PER_SEC);
   #endif    
 
-
   exit(0);
 }
-
-
 
 int statistica(double ran, double *sum, double *sum2, ullint i, FILE *output){
 
