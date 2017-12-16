@@ -34,7 +34,7 @@ typedef struct coord{
   llint y;
 } coord;
 
-void init(int [][L]);
+void init(int**);
 void initNeighbor(long int*,long int*);
 
 void calcheck_d(double*);
@@ -86,7 +86,7 @@ int main(int argc, char *argv[]){
   calcheck_d(RWSUM);
 
 
-  long int plus[L], less[L];
+  lint plus[L], less[L];
   initNeighbor(plus, less);
 
   coord *initpos, *truepos, *condpos;
@@ -210,7 +210,7 @@ int main(int argc, char *argv[]){
 
 
 
-void init(int site[L][L]){
+void init(int **site, int L){
   
   int x, y;
   
