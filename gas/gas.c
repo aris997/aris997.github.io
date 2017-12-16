@@ -5,10 +5,6 @@
 #include <time.h>
 
 #define MEASURES (L)
-#define L 50
-#define RHO 0.2
-#define TMAX 1000
-#define NSTORIES 10000
 #define D 2
 
 //RODARI-RIVA   30 NOVEMBRE 2017    v2.0.0    labfc409
@@ -28,11 +24,14 @@
 //    segmentation fault o altri casi problematici. Gli errori implementati fin'ora sono 99,
 //    100, 101. Ciascuno ha una causa specifica.
 
-typedef long long int pos;
+typedef unsigned long long int ullint;
+typedef long long int llint;
+typedef long int lint;
+
 
 typedef struct coord{
-  pos x;
-  pos y;
+  llint x;
+  llint y;
 } coord;
 
 void init(int [][L]);
@@ -40,24 +39,47 @@ void initNeighbor(long int*,long int*);
 
 void calcheck_d(double*);
 void calcheck_c(coord*);
+void error(int);
 
-int main () {
+int main(int argc, char *argv[]){
+
+  #ifdef CRONO_MODE
+    clock_t begin = clock();
+  #endif
 
   srand(time(NULL));
 
-  //static int MEASURES = TMAX/WIDTH;
-  //static int L = 20;
+  int L, label, r, N, T, i, j, k;
+  lint Tmax, Nstories, x, y;
+  double rho, prob;
 
-  int T, i;
-  int j, k;
-  int N;
-  double prob;
-  int label, r;
-  pos x, y;
+  if(argc == 1){ //conviene creare una funzione qui, ho il cancro a mettere tutti sti if nel main
+    error(1);
+    L = 20;
+    rho = 0.2;
+    Tmax = 1000;
+    Nstories = 100;
+    fprintf(stdout,"L:%d rho:%lf TMAX:%ld NSTORIES:%ld\n", L, rho, Tmax, Nstories);
+  }
 
-  coord *initpos, *truepos, *condpos;
+  else if(argc == 5){
+    L = atol(argv[2]);
+    RHO = atof(argv[3]);
+    TMAX = atol(argv[4]);
+    NSTORIES = atol(argv[5]);
+    fprintf(stdout,"L:%d rho:%lf TMAX:%ld NSTORIES:%ld\n", L, rho, Tmax, Nstories);
+  }
   
-  int site[L][L];
+  else error(1);
+
+
+  int **site;
+  site = (int**) calloc(L, sizeof(int*));
+  if(site == NULL) error(2);
+  for(i=0; i<L; i++){
+    site[i] = (int *) calloc(L, sizeof(int));
+    if (site[i] == NULL) error(2);
+  }
 
   double *RWSUM, *RW;
   RWSUM = (double *) calloc(TMAX, sizeof(double));
@@ -66,6 +88,8 @@ int main () {
 
   long int plus[L], less[L];
   initNeighbor(plus, less);
+
+  coord *initpos, *truepos, *condpos;
 
   for(i=0; i<NSTORIES; i++){
   
@@ -100,7 +124,7 @@ int main () {
       }
     }
 
-    //printf("%d\n",N);
+    //fprintf(stderr,"%d\n",N);
 
 
     for(T=0; T<TMAX; T++){
@@ -174,6 +198,12 @@ int main () {
   fclose(output1);
 
 
+  #ifdef CRONO_MODE
+    clock_t end = clock();
+    fprintf(stdout,"# Execution time:%lf\n", (double)(end-begin)/(double)CLOCKS_PER_SEC);
+  #endif
+
+
   exit(0);
 }
 
@@ -217,4 +247,12 @@ void calcheck_c(coord array[]){
     exit(-1);
   }
   return;
+}
+
+
+void error(int n){
+  if(n == 1){
+    fprintf(stderr,"Insert from line <Lenght> <rho> <TMAX> <NSTORIES>\n");
+  }
+  else exit(-1);
 }

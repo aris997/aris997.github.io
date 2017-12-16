@@ -6,7 +6,6 @@
 #define BOOKS 100
 #define STORIES 100
 #define STEPS 10000
-#define GAP 10
 
 //RODARI-RIVA       labfc409      A.A.2017-2018         v0.1.0
 
@@ -48,7 +47,7 @@ void error(int);
 int main(){
 
   register ullint i;
-  srand(1234567);
+  srand(time(NULL));
 
   double *envr;
   envr = (double *) malloc( (2*STEPS + 1) * sizeof(double)); //Si inizializza un'array disparo.
@@ -64,11 +63,7 @@ int main(){
 
   double r;
 
-  lint book;
-  lint story;
-  lint step;
-
-  lint p;
+  lint book, story, step, p;
 
   double INV_RANDMAX = 1./(double)RAND_MAX;
   double invSTORY = 1./(double)STORIES;
