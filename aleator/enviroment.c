@@ -15,9 +15,22 @@
   Su di una retta un viandante ubriaco si muove tra delle trappole che lo tengono occupato per un
   certo periodo di tempo ogni volta. C'è una probabilità definita a priori per ogni BOOK, esso 
   raccoglie ogni storia in cui il viandante si perde nelle trappole e dura MAX passi.
+  Merita attenzione il metodo che abbiamo scelto per memorizzare le probabilità ambientali.
   Il sistema con cui riproduciamo le trappole è un ingegnoso metodo per inserire in modo alternato
-  le celle pari con quelle dispare, seguendo il criterio definito da una certa funzione.
+  le celle pari con quelle dispare, seguendo il criterio definito da un certo sistema di funzioni.
+  Il sistema è applicato nel cuore dei cicli
 
+    BOOKS for
+      STORIES for
+          STEPS for
+              -----
+              a questo punto del programma tramite degli if, in base al punto in cui si trova il
+              viandante (a sinistra o a destra o sullo zero), si sceglie la cella dell'array che 
+              contiene le probabilità con i (indice dell'array delle probabilità)
+
+              || i = 2 * p - 1     con p > 0
+              || i = - 2 * p       con p < 0
+              || i = 0             con p = 0
 */
 
 typedef unsigned long long int ullint;
