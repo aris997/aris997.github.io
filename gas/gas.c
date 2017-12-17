@@ -28,18 +28,20 @@ typedef unsigned long long int ullint;
 typedef long long int llint;
 typedef long int lint;
 
-
 typedef struct coord{
   llint x;
   llint y;
 } coord;
 
-void init(int**);
-void initNeighbor(long int*,long int*);
+void init(int**,int);
+void initNeighbor(long int*,long int*,int);
 
 void calcheck_d(double*);
 void calcheck_c(coord*);
 void error(int);
+
+
+
 
 int main(int argc, char *argv[]){
 
@@ -49,7 +51,9 @@ int main(int argc, char *argv[]){
 
   srand(time(NULL));
 
-  int L, label, r, N, T, i, j, k;
+
+
+  int L, label, N, T, r, i, j, k;
   lint Tmax, Nstories, x, y;
   double rho, prob;
 
@@ -59,18 +63,20 @@ int main(int argc, char *argv[]){
     rho = 0.2;
     Tmax = 1000;
     Nstories = 100;
-    fprintf(stdout,"L:%d rho:%lf TMAX:%ld NSTORIES:%ld\n", L, rho, Tmax, Nstories);
+    fprintf(stdout,"L:%d rho:%lf Tmax:%ld Nstories:%ld\n", L, rho, Tmax, Nstories);
   }
 
   else if(argc == 5){
-    L = atol(argv[2]);
-    RHO = atof(argv[3]);
-    TMAX = atol(argv[4]);
-    NSTORIES = atol(argv[5]);
-    fprintf(stdout,"L:%d rho:%lf TMAX:%ld NSTORIES:%ld\n", L, rho, Tmax, Nstories);
+    L = atof(argv[2]);
+    rho = atof(argv[3]);
+    Tmax = atof(argv[4]);
+    Nstories = atof(argv[5]);
+    fprintf(stdout,"L:%d rho:%lf Tmax:%ld Nstories:%ld\n", L, rho, Tmax, Nstories);
   }
   
   else error(1);
+
+    fprintf(stderr,"arrivo qui\n");
 
 
   int **site;
@@ -82,33 +88,34 @@ int main(int argc, char *argv[]){
   }
 
   double *RWSUM, *RW;
-  RWSUM = (double *) calloc(TMAX, sizeof(double));
+  RWSUM = (double *) calloc(Tmax, sizeof(double));
   calcheck_d(RWSUM);
 
 
   lint plus[L], less[L];
-  initNeighbor(plus, less);
+  initNeighbor(plus, less, L);
 
   coord *initpos, *truepos, *condpos;
 
-  for(i=0; i<NSTORIES; i++){
+  for(i=0; i<Nstories; i++){
   
-    init(site); //reticolo azzerato
+    init(site, L); //reticolo azzerato
     initpos = (coord *) calloc(L*L, sizeof(coord));
     calcheck_c(initpos); //controllo allocazione
     truepos = (coord *) calloc(L*L, sizeof(coord));
     calcheck_c(truepos); //controllo allocazione
     condpos = (coord *) calloc(L*L, sizeof(coord));
     calcheck_c(condpos); //controllo allocazione
-    RW = (double *) calloc(TMAX, sizeof(double));
+    RW = (double *) calloc(Tmax, sizeof(double));
     calcheck_d(RW); //controllo allocazione
 
     N = 0; //particelle inserite a ogni step
 
+
     for(j=0; j<L; j++){
       for(k=0; k<L; k++){
         prob = (double)rand()/RAND_MAX;
-        if(prob < RHO){
+        if(prob < rho){
           
           site[j][k] = 1;
 
@@ -127,7 +134,7 @@ int main(int argc, char *argv[]){
     //fprintf(stderr,"%d\n",N);
 
 
-    for(T=0; T<TMAX; T++){
+    for(T=0; T<Tmax; T++){
         
       for(k=0; k<N; k++){
 
@@ -175,7 +182,7 @@ int main(int argc, char *argv[]){
     }
 
 
-    for (k=0; k<TMAX; k++){
+    for (k=0; k<Tmax; k++){
         RWSUM[k] += RW[k];
     }
 
@@ -191,8 +198,8 @@ int main(int argc, char *argv[]){
   FILE *output1;
   output1 = fopen("drho.dat", "w");
   fprintf(output1, "#deltaRquadro(t)\n");
-  for(T=0; T<TMAX; T++){
-    fprintf(output1, "%d %.14lf\n", T, ((double)RWSUM[T]/NSTORIES)/(2.*D*T));
+  for(T=0; T<Tmax; T++){
+    fprintf(output1, "%d %.14lf\n", T, ((double)RWSUM[T]/Nstories)/(2.*D*T));
   }
 
   fclose(output1);
@@ -221,7 +228,7 @@ void init(int **site, int L){
   }
 }
 
-void initNeighbor(long int plus[], long int less[], lint L){
+void initNeighbor(lint plus[], lint less[], int L){
 
   int i;
   for(i=0; i<L; i++){
@@ -252,7 +259,7 @@ void calcheck_c(coord array[]){
 
 void error(int n){
   if(n == 1){
-    fprintf(stderr,"Insert from line <Lenght> <rho> <TMAX> <NSTORIES>\n");
+    fprintf(stderr,"Insert from line <Lenght> <rho> <Tmax> <Nstories>\n");
   }
   else exit(-1);
 }
