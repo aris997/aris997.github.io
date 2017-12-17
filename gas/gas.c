@@ -221,7 +221,7 @@ void init(int **site, int L){
   }
 }
 
-void initNeighbor(long int plus[], long int less[]){
+void initNeighbor(long int plus[], long int less[], lint L){
 
   int i;
   for(i=0; i<L; i++){
