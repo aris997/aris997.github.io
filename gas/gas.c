@@ -4,7 +4,7 @@
 #include <math.h>
 #include <time.h>
 
-#define MEASURES (L)
+#define MEASURES 10
 #define D 2
 
 //RODARI-RIVA   30 NOVEMBRE 2017    v2.0.0    labfc409
@@ -172,7 +172,7 @@ int main(int argc, char *argv[]){
         }
       }
 
-      if(T > 0){
+      if(T%MEASURES == 0){
         for (k=0; k<N; k++){
           RW[T] += pow((truepos[k].x-initpos[k].x),2) + pow((truepos[k].y-initpos[k].y),2);
         }
@@ -192,13 +192,17 @@ int main(int argc, char *argv[]){
     free(condpos);
     free(RW);
 
+    fprintf(stderr,"fine storia%d\n", i);
+
   }
 
   FILE *output1;
-  output1 = fopen("drho.dat", "w");
+  char filename[50];
+  sprintf(filename, "drho%02d_%02d.dat", L, (int)(rho*10));
+  output1 = fopen(filename, "w");
   fprintf(output1, "#deltaRquadro(t)\n");
-  for(T=0; T<Tmax; T++){
-    fprintf(output1, "%d %.14lf\n", T, ((double)RWSUM[T]/Nstories)/(2.*D*T));
+  for(i=0; i<Tmax; i+=MEASURES){
+    fprintf(output1, "%d %.14lf\n", i+1, ((double)RWSUM[i]/Nstories)/(2.*D*(i+1.)));
   }
 
   fclose(output1);

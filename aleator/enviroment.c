@@ -5,7 +5,7 @@
 
 #define BOOKS 100
 #define STORIES 100
-#define STEPS 10000
+#define STEPS 100000
 
 //RODARI-RIVA       labfc409      A.A.2017-2018         v0.1.0
 
@@ -36,8 +36,8 @@ typedef unsigned long long int ullint;
 typedef long int lint;
 
 typedef struct meanbook{
-  double book;
-  double book2;
+  double stories;
+  double books;
 }meanbook;
 
 
@@ -50,16 +50,13 @@ int main(){
   srand(time(NULL));
 
   double *envr;
-  envr = (double *) malloc( (2*STEPS + 1) * sizeof(double)); //Si inizializza un'array disparo.
+  envr = (double *) malloc( (2*STEPS + 1) * sizeof(double)); //Si inizializza un'array di indice dispari per le probabilita' ambinetali.
   if(envr == NULL) error(1);
 
   meanbook *log;
   log = (meanbook*) malloc( (STEPS) * sizeof(meanbook));
   if(log == NULL) error(1);
 
-  meanbook *mean;
-  mean = (meanbook*) calloc(STEPS, sizeof(meanbook));
-  if(log == NULL) error(1);
 
   double r;
 
@@ -73,10 +70,6 @@ int main(){
   for(book = 0; book<BOOKS; book++){
 
     story = 0;
-
-    envr = (double *) calloc( (2*STEPS + 1), sizeof(double));
-    if(envr == NULL) error(1);
-
 
     //Inizializzo l'ambiente aleatorio con questo ciclo
     //Le medie sulle storie vengono fatte per ogni libro
@@ -94,7 +87,9 @@ int main(){
 
     log = (meanbook*) calloc(STEPS, sizeof(meanbook));
     if(log == NULL) error(1);
-    for(i=0; i<STEPS; i++) {log[i].book = 0.; log[i].book2 = 0.; }
+    for(i=0; i<STEPS; i++){
+      log[i].stories = 0.;
+    }
 
 
 
@@ -139,9 +134,8 @@ int main(){
         #ifdef RAW_MODE
           fprintf(output, "%ld %ld\n", step + 1, p);
         #endif
-        
-        log[step].book += (double)p;
-        log[step].book2 += (double)p*p;
+
+        log[step].stories += (double)p*p;
 
       }
       #ifdef RAW_MODE
@@ -151,27 +145,26 @@ int main(){
 
 
 
-    for(step=0; step<STEPS; step++){
-      mean[step].book += log[step].book * invSTORY; 
-      mean[step].book2 += log[step].book2 * invSTORY;
+    for(step=0; step<STEPS; step++){ 
+      log[step].books += (double)log[step].stories * invSTORY;
     }
 
   }
 
 
     for(step=0; step<STEPS; step++){
-      mean[step].book *= invBOOK;
-      mean[step].book2 *= invBOOK;
-      fprintf(stdout, "%ld %ld %lf %lf\n", step, step*step, mean[step].book, mean[step].book2);
+      log[step].books *= invBOOK;
+      fprintf(stdout, "%ld %lf\n", step + 1, log[step].books);
     }
 
 
   free(envr);
-  free(mean);
   free(log);
 
   exit(0);
 }
+
+
 
 void error(int n){
   if(n == 1){
