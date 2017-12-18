@@ -67,16 +67,15 @@ int main(int argc, char *argv[]){
   }
 
   else if(argc == 5){
-    L = atof(argv[2]);
-    rho = atof(argv[3]);
-    Tmax = atof(argv[4]);
-    Nstories = atof(argv[5]);
+    L = atol(argv[1]);
+    rho = atof(argv[2]);
+    Tmax = atol(argv[3]);
+    Nstories = atol(argv[4]);
     fprintf(stdout,"L:%d rho:%lf Tmax:%ld Nstories:%ld\n", L, rho, Tmax, Nstories);
   }
   
   else error(1);
 
-    fprintf(stderr,"arrivo qui\n");
 
 
   int **site;
@@ -210,6 +209,7 @@ int main(int argc, char *argv[]){
     fprintf(stdout,"# Execution time:%lf\n", (double)(end-begin)/(double)CLOCKS_PER_SEC);
   #endif
 
+    fprintf(stderr,"arrivo qui\n");
 
   exit(0);
 }
