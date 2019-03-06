@@ -1,5 +1,15 @@
+a {
+    color: black;
+}
+
+a:hover {
+    color: grey;
+}
+
 body {
     background-color: white;
+    padding: 0px;
+    margin: 0;
 }
 
 ul {
@@ -8,7 +18,7 @@ ul {
     list-style-type: none;
     position: sticky;
     width: 13vw;
-    padding: 0;
+    padding: 0px;
     margin: 0;
     top: 0;
 }
@@ -27,6 +37,11 @@ li a:hover {
     background-color: grey;
 }
 
+.active {
+    background-color: rgb(51, 116, 255);
+    color: white;
+}
+
 h1 {
     letter-spacing: 3px;
 }
@@ -35,8 +50,19 @@ h2 {
     letter-spacing: 2px;
 }
 
+footer {
+    color: grey;
+    text-align: center;
+    padding: 0.5vw;
+    font-size: 1vw;
+    font-family: Verdana, Geneva, Tahoma, sans-serif;
+    word-spacing: 3px;
+}
+
 #testo {
-    margin: 13.5vw;
+    margin-left: 13.5vw;
+    margin-right: 13.5vw;
+    margin-top: 2vw;
     text-align: justify;
     font-family: Verdana, Geneva, Tahoma, sans-serif;
 }
