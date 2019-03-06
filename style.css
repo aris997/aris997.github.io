@@ -43,11 +43,16 @@ li a:hover {
 }
 
 h1 {
-    letter-spacing: 3px;
+    letter-spacing: 2px;
 }
 
 h2 {
-    letter-spacing: 2px;
+    letter-spacing: 1px;
+}
+
+p {
+    font-family: Verdana, Geneva, Tahoma, sans-serif;
+    font-size: 0.9vw;
 }
 
 footer {
