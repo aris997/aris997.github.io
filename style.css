@@ -42,11 +42,15 @@ li a:hover {
     color: white;
 }
 
+
+
 h1 {
+    font-size: 2vw;
     letter-spacing: 2px;
 }
 
 h2 {
+    font-size: 1vw;
     letter-spacing: 1px;
 }
 
@@ -55,7 +59,7 @@ p {
     font-size: 0.9vw;
 }
 
-footer {
+footer p{
     color: grey;
     text-align: center;
     padding: 0.5vw;
