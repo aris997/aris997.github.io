@@ -30,6 +30,7 @@ li a {
     text-align: center;
     text-decoration: none;
     font-family: Verdana, Geneva, Tahoma, sans-serif;
+    font-size: 0.95vw;
 }
 
 li a:hover {
@@ -45,11 +46,15 @@ li a:hover {
 
 
 h1 {
+    margin:0;
+    padding:0;
     font-size: 2vw;
     letter-spacing: 2px;
 }
 
 h2 {
+    margin:0;
+    padding:0;
     font-size: 1vw;
     letter-spacing: 1px;
 }
@@ -84,4 +89,17 @@ img {
     margin-left: 13.5vw;
     margin-right: 13.5vw;
     max-width: 1256px;
+}
+
+#codice {
+    font-family: monospace;
+    font-size: 1vw;
+    text-align: justify;
+    color: black;
+}
+
+#capsulacodice {
+    display: block;
+    background-color: lightgrey;
+    border: crimson 1px;    
 }
