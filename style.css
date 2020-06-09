@@ -75,6 +75,7 @@ footer p{
 
 img {
     resize: 8vw;
+    -ms-interpolation-mode: bicubic;
 }
 
 #testo {
